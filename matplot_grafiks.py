@@ -32,7 +32,7 @@ def live_update_demo(blit = False):
     ax2.set_xlim(x.min(), x.max())
     ax2.set_ylim([-1.1, 1.1])
 
-    fig.canvas.draw()   # note that the first draw comes before setting data
+    fig.canvas.draw()   
 
 
     if blit:
@@ -77,10 +77,7 @@ def live_update_demo(blit = False):
 
         fig.canvas.flush_events()
         connection_id = fig.canvas.mpl_connect('button_press_event', onclick)
-        #alternatively you could use
-        #plt.pause(0.000000000001)
-        # however plt.pause calls canvas.draw(), as can be read here:
-        #http://bastibe.de/2013-05-30-speeding-up-matplotlib.html
+
 
 
 live_update_demo(True)   # 175 fps
