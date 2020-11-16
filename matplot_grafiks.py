@@ -67,10 +67,6 @@ def live_update_demo(blit = False):
             fig.canvas.blit(ax1.bbox)
             fig.canvas.blit(ax2.bbox)
 
-            # in this post http://bastibe.de/2013-05-30-speeding-up-matplotlib.html
-            # it is mentionned that blit causes strong memory leakage.
-            # however, I did not observe that.
-
         else:
             # redraw everything
             fig.canvas.draw()
