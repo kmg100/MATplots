@@ -1,59 +1,192 @@
+# -*- coding: utf-8 -*-
 
+###########################################################################
+## Python code generated with wxFormBuilder (version Jul 19 2019)
+## http://www.wxformbuilder.org/
+##
+## PLEASE DO *NOT* EDIT THIS FILE!
+###########################################################################
+import wx.lib.agw.aui as aui
+import wx.lib.mixins.inspection as wit
+import numpy as np
+from matplotlib import pyplot as plt
+
+import matplotlib as mpl
+from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 import wx
 import time
-import numpy as np 
- 
-class MyForm(wx.Frame):
- 
-    def __init__(self, parent ):
-        wx.Frame.__init__(self, None, wx.ID_ANY, "Timer Tutorial 1", 
-                                   size=(500,500))
- 
-        # Add a panel so it looks the correct on all platforms
-        panel = wx.Panel(self, wx.ID_ANY)
+#import wx.xrc
+
+###########################################################################
+## Class Testu_logs
+###########################################################################
+
+fps = 0.
+drawing = False
+start_time = time.time()
+
+class Testu_logs ( wx.Frame ):
+
+    def __init__( self, parent ):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Testu logs", pos = wx.DefaultPosition, size = wx.Size( 700,450 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         
-        self.timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.update, self.timer)
-        self.toggleBtn = wx.Button(panel, wx.ID_ANY, "Start")
-        bSizer2 = wx.BoxSizer( wx.VERTICAL )
-        self.toggleBtn.Bind(wx.EVT_BUTTON, self.onToggle)
-       
         
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+
+        bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        bSizer1.Add( self.m_panel1, 1, wx.EXPAND, 5 )
+
+        self.m_panel2 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_SUNKEN|wx.TAB_TRAVERSAL )
+        self.m_panel2.SetMinSize( wx.Size( 150,-1 ) )
+        
+        self.figure = Figure()
+        self.axes = self.figure.add_subplot(111)
+        self.canvas = FigureCanvas(self, -1, self.figure)
+        self.sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer.Add(self.canvas,1,wx.EXPAND)
+        self.SetSizer(self.sizer)
+        global x
         x = np.linspace(0,50., num=100)
         X,Y = np.meshgrid(x,x)
-        self.m_bitmap2 = wx.StaticBitmap( panel, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.Bitmap = wx.Bitmap()
-        bSizer2.Add( self.m_bitmap2, 0, wx.ALL, 5 )
-        panel.SetSizer( bSizer2 )
-        panel.Layout()
-        bSizer2.Fit( panel )
+        global line
+        line, = self.axes.plot([], lw=3)
+        global k
+        k=0.
+        global Blit
+        Blit = True
+        ##########TIMER
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.draw, self.timer)
+
+        ################
+        self.axes.set_xlim(x.min(), x.max())
+        self.axes.set_ylim([-1.1, 1.1])
+        self.figure.canvas.draw() 
         
+        self.axesbackground = self.figure.canvas.copy_from_bbox(self.axes.bbox)
+        plt.show(block=False)
         
+        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+
+
+        bSizer2.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+        self.m_button1 = wx.Button( self.m_panel2, wx.ID_ANY, u"Variants A", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer2.Add( self.m_button1, 0, wx.ALL, 5 )
+
+        self.m_button2 = wx.Button( self.m_panel2, wx.ID_ANY, u"Variants B", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer2.Add( self.m_button2, 0, wx.ALL, 5 )
         
+        self.toggleBtn = wx.Button(self.m_panel2, wx.ID_ANY, "Start")
+        bSizer2.Add( self.toggleBtn, 0, wx.ALL, 5 )
+
+
+        bSizer2.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+
+        self.m_panel2.SetSizer( bSizer2 )
+        self.m_panel2.Layout()
+        bSizer2.Fit( self.m_panel2 )
+        bSizer1.Add( self.m_panel2, 0, wx.EXPAND, 5 )
+
         
-        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+
+
+        self.Centre( wx.BOTH )
+        self.m_statusBar1 = self.CreateStatusBar( 1, wx.STB_SIZEGRIP|wx.BORDER_RAISED, wx.ID_ANY )
+        # Connect Events
+        self.Bind( wx.EVT_CLOSE, self.OnClose )
+        self.Bind( wx.EVT_IDLE, self.OnIdle )
+        self.m_button1.Bind( wx.EVT_BUTTON, self.OnVariantsA )
+        self.m_button2.Bind( wx.EVT_BUTTON, self.OnVariantsB )
+        self.toggleBtn.Bind(wx.EVT_BUTTON, self.onToggle)
+        ########################
+        #self.figure = mpl.figure.Figure(figsize=(2, 2))
+        #self.canvas = FigureCanvas(self, -1, self.figure)
+        #self.timer = wx.Timer(self)
+        #self.Bind(wx.EVT_TIMER, self.TimeInterval, self.tim
+
+
+    def __del__( self ):
+        pass
+
+
+    # Virtual event handlers, overide them in your derived class
+    def OnClose( self, event ):
+        #self.Close()
+        #pass
+        event.Skip()
+
+    def OnIdle( self, event ):
+        event.Skip()
         
     def onToggle(self, event):
         btnLabel = self.toggleBtn.GetLabel()
         if btnLabel == "Start":
             print ("starting timer...")
-            self.timer.Start(1000)
+            self.timer.Start(1)
             self.toggleBtn.SetLabel("Stop")
         else:
             print ("timer stopped!")
             self.timer.Stop()
             self.toggleBtn.SetLabel("Start")
-            
-    def update(self, event):
-        print ("\nupdated: ")
-        print (time.ctime())
-    def bitmap(self):
-        wx.Bitmap.__init__(self,None, type=wx.BitmapFromBits)
+
+    def OnVariantsA( self, event ):
+        global Blit
+        Blit = True
+        print ("With Blit")
+        #self.timer.Start(10)
+
+    def OnVariantsB( self, event ):
+        global Blit
+        print ("Without Blit")
+        Blit = False
+        #self.timer.Stop()
+    #def TimeInterval(self, event):
         
-# Run the program
+
+    def draw(self, event):
+        global start_time
+        global k, fps
+        global Blit
+        global drawing
+        
+        if drawing:
+            return
+        drawing = True
+        #x = np.linspace(0,50., num=100)
+        #X,Y = np.meshgrid(x,x)
+        #self.set_data(x, np.sin(x/3.+k))
+        
+        #self.axes.plot([], lw=3)
+        k+=0.11
+        line.set_data(x, np.sin(x/3.+k))
+        if Blit == True:
+            self.figure.canvas.restore_region(self.axesbackground)
+            self.axes.draw_artist(line)
+            self.figure.canvas.blit(self.axes.bbox)
+            #print(k)
+        else:
+            self.figure.canvas.draw()
+        self.figure.canvas.flush_events()
+        #####
+        current_time = time.time()
+        fps =  int( ( 9 * fps + 1.0 / ( current_time - start_time ) ) / 10 )
+        #fps = str( int( fps ) )
+        self.m_statusBar1.SetStatusText( 'FPS:{0:3d}'.format( fps ) )
+        start_time = current_time
+        drawing = False
+        
+        
 class MainApp(wx.App):
     def OnInit(self):
-        mainFrame = MyForm(None)
+        mainFrame = Testu_logs(None)
         #mainFrame.draw()
         #mainFrame.status()
         mainFrame.Show(True)
@@ -65,3 +198,13 @@ if __name__ =='__main__':
     # start time of the loop
    app = MainApp()
    app.MainLoop()
+
+
+
+#app = wx.App( False )
+
+#frame = Testu_logs( None )
+#frame.Show( True )
+
+#start the applications
+#app.MainLoop()
