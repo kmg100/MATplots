@@ -171,11 +171,10 @@ class Testu_logs ( wx.Frame ):
             self.figure.canvas.draw()#parzime jaunu bar tikai
         else:                                  #paraastais veids ka zimet barus ar nodzesanu
             self.axes.clear()
-            for i in range(len(self.barcollection)):
-                y = np.random.randint(1,101,5)
-                my_cmap = plt.cm.get_cmap('jet')
-                colors = my_cmap(y)
-                self.barcollection = self.axes.bar(x,y, color=colors)
+            y = np.random.randint(1,101,5)
+            my_cmap = plt.cm.get_cmap('jet')
+            colors = my_cmap(y)
+            self.barcollection = self.axes.bar(x,y, color=colors)
             self.figure.canvas.draw()
             self.axes.clear()
         #self.figure.canvas.flush_events()
