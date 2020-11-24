@@ -160,6 +160,7 @@ class Testu_logs ( wx.Frame ):
         if drawing:
             return
         drawing = True
+        self.figure.canvas.mpl_connect('button_press_event', self.OnClick)
         #x = np.linspace(0,50., num=100)
         #X,Y = np.meshgrid(x,x)
         #self.set_data(x, np.sin(x/3.+k))
