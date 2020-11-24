@@ -183,6 +183,15 @@ class Testu_logs ( wx.Frame ):
         start_time = current_time
         drawing = False
         
+    def OnClick(self, event):
+        if event.dblclick:  
+            pass
+        else:
+            if event.button == 3:#prints data ja spiez labo peles klikski
+            # pop up
+                print(event.xdata,event.ydata)
+            #### event.xdata,event.ydata # here you click on the plot
+        
         
 class MainApp(wx.App):
     def OnInit(self):
