@@ -188,11 +188,11 @@ class Testu_logs ( wx.Frame ):
             if event.button == 3:
                 try:#wx.MessageBox("This is a Message Box", "Message" ,wx.OK | wx.ICON_INFORMATION)
                     if wx.TheClipboard.Open():
-                        wx.TheClipboard.SetData(wx.TextDataObject(str(int(event.xdata))))
+                        wx.TheClipboard.SetData(wx.TextDataObject(str("%.2f" %event.ydata)))
                         print("sucess")
                         wx.TheClipboard.Close()
-                    self.xdata1=str(int(event.xdata))
-                    self.ydata1=int((event.ydata))
+                    self.xdata1=str("%.2f" %event.xdata)
+                    self.ydata1=str("%.2f" %event.ydata)
                     print(self.xdata1,self.ydata1)
                     a = MyDialog(self, "Dialog",self.ydata1).ShowModal()
                 except TypeError:
