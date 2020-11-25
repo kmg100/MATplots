@@ -194,17 +194,19 @@ class Testu_logs ( wx.Frame ):
                     self.xdata1=str("%.2f" %event.xdata)
                     self.ydata1=str("%.2f" %event.ydata)
                     print(self.xdata1,self.ydata1)
-                    a = MyDialog(self, "Dialog",self.ydata1).ShowModal()
+                    a = MyDialog(self, "Dialog",self.xdata1,self.ydata1).ShowModal()
                 except TypeError:
                     pass
         
 class MyDialog(wx.Dialog): 
-   def __init__(self, parent, title, text): 
-      super(MyDialog, self).__init__(parent, title = "Izvēlētie Dati", size = (250,150)) 
+   def __init__(self, parent, title, xtext,ytext): 
+      super(MyDialog, self).__init__(parent, title = "Izvēlētie Dati", size = (150,150)) 
       panel = wx.Panel(self) 
-      self.textboxSampleTime =  wx.StaticText(self, -1,label=text, pos = (0,0))
-      
-      self.btn = wx.Button(panel, wx.ID_OK, label = "ok", size = (50,20), pos = (75,50))
+      #####Text box for data
+      self.textboxSampleTime =  wx.StaticText(panel, -1,label=xtext, pos = (0,0))
+      self.textboxSampleTime =  wx.StaticText(panel, -1,label=ytext, pos = (0,15))
+      #####Button
+      self.btn = wx.Button(panel, wx.ID_OK, label = "EXIT", size = (50,20), pos = (50,50))
       
 class MainApp(wx.App):
     def OnInit(self):
