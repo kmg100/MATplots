@@ -185,12 +185,29 @@ class Testu_logs ( wx.Frame ):
         if event.dblclick:  
             pass
         else:
-            if event.button == 3:#prints data ja spiez labo peles klikski
-            # pop up
-                print(event.xdata,event.ydata)
-            #### event.xdata,event.ydata # here you click on the plot
+            if event.button == 3:
+                try:#wx.MessageBox("This is a Message Box", "Message" ,wx.OK | wx.ICON_INFORMATION)
+                    if wx.TheClipboard.Open():
+                        wx.TheClipboard.SetData(wx.TextDataObject(str(int(event.xdata))))
+                        print("sucess")
+                        wx.TheClipboard.Close()
+                    self.xdata1=str(int(event.xdata))
+                    self.ydata1=int((event.ydata))
+                    print(self.xdata1,self.ydata1)
+                    a = MyDialog(self, "Dialog",self.ydata1).ShowModal()
+                except TypeError:
+                    pass
         
-        
+class MyDialog(wx.Dialog): 
+   def __init__(self, parent, title, text): 
+      global xdata1
+      xdata1="stupid"
+      super(MyDialog, self).__init__(parent, title = "Izvēlētie Dati", size = (250,150)) 
+      panel = wx.Panel(self) 
+      self.textboxSampleTime =  wx.StaticText(self, -1,label=text, pos = (0,0))
+      
+      self.btn = wx.Button(panel, wx.ID_OK, label = "ok", size = (50,20), pos = (75,50))
+      
 class MainApp(wx.App):
     def OnInit(self):
         mainFrame = Testu_logs(None)
