@@ -175,7 +175,10 @@ class Testu_logs ( wx.Frame ):
         self.figure.canvas.flush_events()
         #####
         current_time = time.time()
-        fps =  int( ( 9 * fps + 1.0 / ( current_time - start_time ) ) / 10 )
+        try:
+            fps =  int( ( 9 * fps + 1.0 / ( current_time - start_time ) ) / 10 )
+        except ZeroDivisionError as e:
+            pass
         #fps = str( int( fps ) )
         self.m_statusBar1.SetStatusText( 'FPS:{0:3d}'.format( fps ) )
         start_time = current_time
