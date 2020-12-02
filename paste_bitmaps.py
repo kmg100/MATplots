@@ -163,6 +163,8 @@ class Testu_logs ( wx.Frame ):
         datas = self.imgG.getdata()
         for item in datas:
             self.imgG.putdata((0,0,0,0))
+            self.imgG.putdata((0,0,0,0))
+            self.imgG.putdata((0,0,0,0))
         self.Combine()
         print ("With Blit")
         #self.timer.Start(10)
@@ -172,13 +174,15 @@ class Testu_logs ( wx.Frame ):
         datas1 = self.imgB.getdata()
         for item in datas1:
             self.imgG.putdata((0,0,0,85))
+            self.imgR.putdata((0,0,0,0))
+            self.imgB.putdata((0,0,0,0))
         self.Combine()
        
         Blit = False
     
     def Combine(self):
-        self.imgB.paste(self.imgG,self.imgR)
-        self.wx_image.SetData(self.imgB.convert("RGB").tobytes())
+        self.image = Image.alpha_composite(self.imgG.convert('RGBA'), Image.alpha_composite(self.imgR.convert('RGBA'), self.imgB.convert('RGBA')))
+        self.wx_image.SetData(self.image.convert("RGB").tobytes())
         self.wx_image.SetAlpha(self.imgB.convert("RGBA").tobytes()[3::4])
         self.bitmap = wx.Bitmap(self.wx_image)
         self.mapStatBit =  wx.StaticBitmap( self.m_panel1,wx.ID_ANY, self.bitmap)
@@ -208,14 +212,14 @@ class Testu_logs ( wx.Frame ):
         drawing = True
         
         #x = np.linspace(0,1000., num=100)
-        draw = ImageDraw.Draw(self.imgG)
+        #draw = ImageDraw.Draw(self.imgG)
         #self.y+=0.5
-        self.line_points.append((self.x,randint(0, 300)) )#for i in np.arange(3),
-        self.x+=1
+        #self.line_points.append((self.x,randint(0, 300)) )#for i in np.arange(3),
+        #self.x+=1
         #self.y=100*np.sin(self.x/4+k)
         #print(self.line_points)
         #line_points = [(100, 100), (150, 200), (300, 100), (500, 300)]
-        draw.line(self.line_points, width=1, fill=1, joint='curve')
+        #draw.line(self.line_points, width=1, fill=1, joint='curve')
         self.mapStatBit.Refresh()
         #self.Refresh()
         #self.img.show()
