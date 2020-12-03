@@ -117,6 +117,9 @@ class Testu_logs ( wx.Frame ):
         
         self.toggleBtn = wx.Button(self.m_panel2, wx.ID_ANY, "Start")
         bSizer2.Add( self.toggleBtn, 0, wx.ALL, 5 )
+        self.sld = wx.Slider(self.m_panel2, value = 10, minValue = 1, maxValue = 255,style = wx.SL_HORIZONTAL|wx.SL_LABELS)
+
+        #self.txt = wx.StaticText(self.m_panel2, label = 'Hello',style = wx.ALIGN_CENTER)
 
 
         bSizer2.Add( ( 0, 0), 1, wx.EXPAND, 5 )
@@ -142,6 +145,7 @@ class Testu_logs ( wx.Frame ):
         self.toggleBtn.Bind(wx.EVT_BUTTON, self.onToggle)
         #lai zimetu vislaik uz panela 1
         self.m_panel1.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.sld.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
         ########################
 
 
@@ -174,18 +178,21 @@ class Testu_logs ( wx.Frame ):
     def OnVariantsA( self, event ):
         global Blit
         Blit = True
-        self.imgG.putdata((0,0,0,0))
-        #self.Combine()
+        self.imgR.putalpha(128)
+        self.imgG.putalpha(0)
+        self.imgB.putalpha(30)
+        self.Combine()
         print ("With Blit")
         #self.timer.Start(10)
 
     def OnVariantsB( self, event ):
         global Blit
-        datas = self.imgG.getdata()
-        for item in datas:
-            self.imgG.putdata((0,0,0,0))
-        #self.imgR.putdata((255,255,255,150))
-        #self.imgB.putdata((255,255,255,150))
+        for i in range(1,255):
+            self.imgR.putalpha(i)
+        self.imgG.putalpha(200)
+        self.imgB.putalpha(128)
+        self.Combine()
+
        
         Blit = False
     
@@ -196,14 +203,19 @@ class Testu_logs ( wx.Frame ):
         dc.SetBackground(wx.Brush("WHITE"))
 
         # ... drawing here all other images in order of overlapping
-        if Blit == True:
-            dc.DrawBitmap(self.bmp , 0, 0, True)
-            dc.DrawBitmap(self.bmp2, 0, 0, True)
-        elif Blit == False:
-            dc.DrawBitmap(self.bmp3, 0, 0, True)
         
-
-
+        dc.DrawBitmap(self.bmp , 0, 0, True)
+        dc.DrawBitmap(self.bmp2, 0, 0, True)
+        dc.DrawBitmap(self.bmp3, 0, 0, True)
+        
+    def OnSliderScroll(self, event): 
+        obj = event.GetEventObject()
+        val = obj.GetValue()
+        self.imgG.putalpha(val)
+        #self.imgR.putalpha(10)
+        #self.imgB.putalpha(10)
+        self.Combine()
+        
     def draw(self, event):
         global start_time
         global k, fps
@@ -229,6 +241,23 @@ class Testu_logs ( wx.Frame ):
         self.m_statusBar1.SetStatusText( 'FPS:{0:3d}'.format( fps ) )
         start_time = current_time
         drawing = False
+        
+        
+    def Combine(self):
+
+        #### seit pil attela datus iedod wx attelam gan rga vertibas gan alpha vertibas
+        self.wx_image1.SetData(self.imgR.convert("RGB").tobytes())
+        self.wx_image1.SetAlpha(self.imgR.convert("RGBA").tobytes()[3::4])
+        self.wx_image2.SetData(self.imgG.convert("RGB").tobytes())
+        self.wx_image2.SetAlpha(self.imgG.convert("RGBA").tobytes()[3::4])
+        self.wx_image3.SetData(self.imgB.convert("RGB").tobytes())
+        self.wx_image3.SetAlpha(self.imgB.convert("RGBA").tobytes()[3::4])
+        
+        #self.wx_image1.SetAlpha(150)
+        #no atteliem parveido uz bitmap
+        self.bmp = wx.Bitmap(self.wx_image1)
+        self.bmp2 = wx.Bitmap(self.wx_image2)
+        self.bmp3 = wx.Bitmap(self.wx_image3)
         
     def OnClick(self, event):
         if event.dblclick:  
