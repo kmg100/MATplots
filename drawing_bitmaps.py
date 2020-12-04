@@ -5,10 +5,8 @@ from PIL import Image, ImageDraw
 #from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 import wx
 import time
-from random import randint
-from turtle import *
 global xdata1
-
+import numpy as np
 fps = 0.
 drawing = False
 start_time = time.time()
@@ -19,21 +17,6 @@ start_time = time.time()
 
 
 
-"""
-ht(); speed(0)
-color('green'); width(1)
-
-for i in range(4): # axes
-    fd(80); bk(80); rt(90)
-
-color('red'); width(2)
-pu(); goto(-50, -70); pd()
-
-for x in range(-50, 30):
-    y = 2*x + 30
-    goto(x, y)
-
-"""
 class Testu_logs ( wx.Frame ):
 
     def __init__( self, parent ):
@@ -56,7 +39,34 @@ class Testu_logs ( wx.Frame ):
         draw3.line((200,200, 50,500), fill='red',width=20)
         
         #self.imgG.putdata((0,0,0,0))
+        datas1 = self.imgG.getdata()
+        datas2 = self.imgR.getdata()
+        datas3 = self.imgB.getdata()
+        newData1=[]
+        newData2=[]
+        newData3=[]
+        for item1 in datas1:
+            if item1[0] == 255 and item1[1] == 255 and item1[2] == 255:
+                newData1.append((255, 255, 255, 0))
+            else:
+                newData1.append(item1)
+        self.imgG.putdata(newData1)
+        for item2 in datas2:
+            if item2[0] == 255 and item2[1] == 255 and item2[2] == 255:
+                newData2.append((255, 255, 255, 0))
+            else:
+                newData2.append(item2)
+        self.imgR.putdata(newData2)
+        for item3 in datas3:
+            if item3[0] == 255 and item3[1] == 255 and item3[2] == 255:
+                newData3.append((255, 255, 255, 0))
+            else:
+                newData3.append(item3)
+        self.imgB.putdata(newData3)
         
+        #self.im1 = self.imgG.save("imgR.jpg") 
+        #self.im2 = self.imgG.save("imgG.jpg") 
+        #self.im3 = self.imgG.save("imgB.jpg") 
         self.m_panel2 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_SUNKEN|wx.TAB_TRAVERSAL )
         self.m_panel2.SetMinSize( wx.Size( 150,-1 ) )
         self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
@@ -71,10 +81,10 @@ class Testu_logs ( wx.Frame ):
         #### seit pil attela datus iedod wx attelam gan rga vertibas gan alpha vertibas
         self.wx_image1.SetData(self.imgR.convert("RGB").tobytes())
         self.wx_image1.SetAlpha(self.imgR.convert("RGBA").tobytes()[3::4])
-        self.wx_image2.SetData(self.imgG.convert("RGB").tobytes())
-        self.wx_image2.SetAlpha(self.imgG.convert("RGBA").tobytes()[3::4])
-        self.wx_image3.SetData(self.imgB.convert("RGB").tobytes())
-        self.wx_image3.SetAlpha(self.imgB.convert("RGBA").tobytes()[3::4])
+        self.wx_image2.SetData(self.imgB.convert("RGB").tobytes())
+        self.wx_image2.SetAlpha(self.imgB.convert("RGBA").tobytes()[3::4])
+        self.wx_image3.SetData(self.imgG.convert("RGB").tobytes())
+        self.wx_image3.SetAlpha(self.imgG.convert("RGBA").tobytes()[3::4])
         
         #self.wx_image1.SetAlpha(150)
         #no atteliem parveido uz bitmap
@@ -117,7 +127,9 @@ class Testu_logs ( wx.Frame ):
         
         self.toggleBtn = wx.Button(self.m_panel2, wx.ID_ANY, "Start")
         bSizer2.Add( self.toggleBtn, 0, wx.ALL, 5 )
-        self.sld = wx.Slider(self.m_panel2, value = 10, minValue = 1, maxValue = 255,style = wx.SL_HORIZONTAL|wx.SL_LABELS)
+        self.sldR = wx.Slider(self.m_panel2, value = 10, minValue = 0,pos=(0,0), maxValue = 255,style = wx.SL_HORIZONTAL|wx.SL_LABELS)
+        self.sldG = wx.Slider(self.m_panel2, value = 10, minValue = 0,pos=(0,50), maxValue = 255,style = wx.SL_HORIZONTAL|wx.SL_LABELS)
+        self.sldB = wx.Slider(self.m_panel2, value = 10, minValue = 0,pos=(0,100), maxValue = 255,style = wx.SL_HORIZONTAL|wx.SL_LABELS)
 
         #self.txt = wx.StaticText(self.m_panel2, label = 'Hello',style = wx.ALIGN_CENTER)
 
@@ -145,7 +157,9 @@ class Testu_logs ( wx.Frame ):
         self.toggleBtn.Bind(wx.EVT_BUTTON, self.onToggle)
         #lai zimetu vislaik uz panela 1
         self.m_panel1.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.sld.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
+        self.sldR.Bind(wx.EVT_SLIDER, self.OnSliderScrollR)
+        self.sldG.Bind(wx.EVT_SLIDER, self.OnSliderScrollG)
+        self.sldB.Bind(wx.EVT_SLIDER, self.OnSliderScrollB)
         ########################
 
 
@@ -168,7 +182,7 @@ class Testu_logs ( wx.Frame ):
         btnLabel = self.toggleBtn.GetLabel()
         if btnLabel == "Start":
             print ("starting timer...")
-            self.timer.Start(0)
+            self.timer.Start(1)
             self.toggleBtn.SetLabel("Stop")
         else:
             print ("timer stopped!")
@@ -179,8 +193,8 @@ class Testu_logs ( wx.Frame ):
         global Blit
         Blit = True
         self.imgR.putalpha(128)
-        self.imgG.putalpha(0)
-        self.imgB.putalpha(30)
+        self.imgB.putalpha(0)
+        self.imgG.putalpha(30)
         self.Combine()
         print ("With Blit")
         #self.timer.Start(10)
@@ -208,30 +222,35 @@ class Testu_logs ( wx.Frame ):
         dc.DrawBitmap(self.bmp2, 0, 0, True)
         dc.DrawBitmap(self.bmp3, 0, 0, True)
         
-    def OnSliderScroll(self, event): 
+    def OnSliderScrollR(self, event): 
+        obj = event.GetEventObject()
+        val = obj.GetValue()
+        self.imgR.putalpha(val)
+        #self.imgR.putalpha(10)
+        #self.imgB.putalpha(10)
+        self.imgR = self.transp(self.imgR)
+        self.bmp = self.Combine(self.imgR)
+        
+    def OnSliderScrollG(self, event): 
         obj = event.GetEventObject()
         val = obj.GetValue()
         self.imgG.putalpha(val)
         #self.imgR.putalpha(10)
         #self.imgB.putalpha(10)
-        self.Combine()
+        self.imgG = self.transp(self.imgG)
+        self.bmp2 = self.Combine(self.imgG)
         
+    def OnSliderScrollB(self, event): 
+        obj = event.GetEventObject()
+        val = obj.GetValue()
+        self.imgB.putalpha(val)
+        self.imgB = self.transp(self.imgB)
+        self.bmp3 = self.Combine(self.imgB)
+
     def draw(self, event):
         global start_time
         global k, fps
-        global Blit
-        global drawing
-        
-        
-        if drawing:
-            return
-        drawing = True
-
-        
         self.m_panel1.Refresh()#komanda lai parzimetu attēlu
-        
-        #self.img.show()
-        #####
         current_time = time.time()
         try:
             fps =  int( ( 9 * fps + 1.0 / ( current_time - start_time ) ) / 10 )
@@ -240,24 +259,27 @@ class Testu_logs ( wx.Frame ):
         #fps = str( int( fps ) )
         self.m_statusBar1.SetStatusText( 'FPS:{0:3d}'.format( fps ) )
         start_time = current_time
-        drawing = False
-        
-        
-    def Combine(self):
 
-        #### seit pil attela datus iedod wx attelam gan rga vertibas gan alpha vertibas
-        self.wx_image1.SetData(self.imgR.convert("RGB").tobytes())
-        self.wx_image1.SetAlpha(self.imgR.convert("RGBA").tobytes()[3::4])
-        self.wx_image2.SetData(self.imgG.convert("RGB").tobytes())
-        self.wx_image2.SetAlpha(self.imgG.convert("RGBA").tobytes()[3::4])
-        self.wx_image3.SetData(self.imgB.convert("RGB").tobytes())
-        self.wx_image3.SetAlpha(self.imgB.convert("RGBA").tobytes()[3::4])
         
+        ##funkcija kas partaisa balto fonu uz caurspidigu
+        
+    def transp(self,img):
+        imgnp = np.array(img.convert('RGBA')).copy() 
+        white = np.sum(imgnp[:,:,:3], axis=2)
+        white_mask = np.where(white == 255*3, 1, 0)
+        alpha = np.where(white_mask, 0, imgnp[:,:,-1])
+        imgnp[:,:,-1] = alpha 
+        return Image.fromarray(np.uint8(imgnp))
+        ##si funkcija parveido jauno attelu par bitmapu
+    def Combine(self, convimg):
+        self.wx_image = wx.Image(600, 600)
+        #### seit pil attela datus iedod wx attelam gan rga vertibas gan alpha vertibas
+        self.wx_image.SetData(convimg.convert("RGB").tobytes())
+        self.wx_image.SetAlpha(convimg.convert("RGBA").tobytes()[3::4])
         #self.wx_image1.SetAlpha(150)
         #no atteliem parveido uz bitmap
-        self.bmp = wx.Bitmap(self.wx_image1)
-        self.bmp2 = wx.Bitmap(self.wx_image2)
-        self.bmp3 = wx.Bitmap(self.wx_image3)
+        return wx.Bitmap(self.wx_image)
+
         
     def OnClick(self, event):
         if event.dblclick:  
