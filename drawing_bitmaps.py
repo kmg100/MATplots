@@ -27,9 +27,9 @@ class Testu_logs ( wx.Frame ):
 
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
         ####Izveidoti jauni atteli ar RGBA kanaliem
-        self.imgG = Image.new('RGBA', (600,600), color=(255,255,255,80))
-        self.imgB = Image.new('RGBA', (600,600), color=(255,255,255,80))
-        self.imgR = Image.new('RGBA', (600,600), color=(255,255,255,80))
+        self.imgG = Image.new('RGBA', (600,600), color=(255,255,255,0))
+        self.imgB = Image.new('RGBA', (600,600), color=(255,255,255,0))
+        self.imgR = Image.new('RGBA', (600,600), color=(255,255,255,0))
         #uzzime virsu viniem
         draw = ImageDraw.Draw(self.imgG)
         draw.line((100,200, 150,300), fill='green',width=10)
@@ -39,31 +39,8 @@ class Testu_logs ( wx.Frame ):
         draw3.line((200,200, 50,500), fill='red',width=20)
         
         #self.imgG.putdata((0,0,0,0))
-        datas1 = self.imgG.getdata()
-        datas2 = self.imgR.getdata()
-        datas3 = self.imgB.getdata()
-        newData1=[]
-        newData2=[]
-        newData3=[]
-        for item1 in datas1:
-            if item1[0] == 255 and item1[1] == 255 and item1[2] == 255:
-                newData1.append((255, 255, 255, 0))
-            else:
-                newData1.append(item1)
-        self.imgG.putdata(newData1)
-        for item2 in datas2:
-            if item2[0] == 255 and item2[1] == 255 and item2[2] == 255:
-                newData2.append((255, 255, 255, 0))
-            else:
-                newData2.append(item2)
-        self.imgR.putdata(newData2)
-        for item3 in datas3:
-            if item3[0] == 255 and item3[1] == 255 and item3[2] == 255:
-                newData3.append((255, 255, 255, 0))
-            else:
-                newData3.append(item3)
-        self.imgB.putdata(newData3)
-        
+
+
         #self.im1 = self.imgG.save("imgR.jpg") 
         #self.im2 = self.imgG.save("imgG.jpg") 
         #self.im3 = self.imgG.save("imgB.jpg") 
@@ -88,9 +65,9 @@ class Testu_logs ( wx.Frame ):
         
         #self.wx_image1.SetAlpha(150)
         #no atteliem parveido uz bitmap
-        self.bmp = wx.Bitmap(self.wx_image1)
-        self.bmp2 = wx.Bitmap(self.wx_image2)
-        self.bmp3 = wx.Bitmap(self.wx_image3)
+        self.bmp = self.transp(self.imgR)
+        self.bmp2 = self.transp(self.imgG)
+        self.bmp3 = self.transp(self.imgB)
         
         #self.bmp=wx.Bitmap.FromBuffer(600,600,self.imgR.tobytes())
         #self.bmp2=wx.Bitmap.FromBuffer(600,600,self.imgG.tobytes())
@@ -226,26 +203,21 @@ class Testu_logs ( wx.Frame ):
         obj = event.GetEventObject()
         val = obj.GetValue()
         self.imgR.putalpha(val)
-        #self.imgR.putalpha(10)
-        #self.imgB.putalpha(10)
-        self.imgR = self.transp(self.imgR)
-        self.bmp = self.Combine(self.imgR)
-        
+        self.bmp = self.transp(self.imgR)
+                
     def OnSliderScrollG(self, event): 
         obj = event.GetEventObject()
         val = obj.GetValue()
         self.imgG.putalpha(val)
-        #self.imgR.putalpha(10)
-        #self.imgB.putalpha(10)
-        self.imgG = self.transp(self.imgG)
-        self.bmp2 = self.Combine(self.imgG)
+        self.bmp2  = self.transp(self.imgG)
+        
         
     def OnSliderScrollB(self, event): 
         obj = event.GetEventObject()
         val = obj.GetValue()
         self.imgB.putalpha(val)
-        self.imgB = self.transp(self.imgB)
-        self.bmp3 = self.Combine(self.imgB)
+        self.bmp3 = self.transp(self.imgB)
+        
 
     def draw(self, event):
         global start_time
@@ -269,16 +241,9 @@ class Testu_logs ( wx.Frame ):
         white_mask = np.where(white == 255*3, 1, 0)
         alpha = np.where(white_mask, 0, imgnp[:,:,-1])
         imgnp[:,:,-1] = alpha 
-        return Image.fromarray(np.uint8(imgnp))
         ##si funkcija parveido jauno attelu par bitmapu
-    def Combine(self, convimg):
-        self.wx_image = wx.Image(600, 600)
-        #### seit pil attela datus iedod wx attelam gan rga vertibas gan alpha vertibas
-        self.wx_image.SetData(convimg.convert("RGB").tobytes())
-        self.wx_image.SetAlpha(convimg.convert("RGBA").tobytes()[3::4])
-        #self.wx_image1.SetAlpha(150)
         #no atteliem parveido uz bitmap
-        return wx.Bitmap(self.wx_image)
+        return wx.Bitmap.FromBufferRGBA(600,600,imgnp)
 
         
     def OnClick(self, event):
